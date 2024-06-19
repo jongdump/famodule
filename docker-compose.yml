@@ -10,7 +10,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - "9404:5432"
+      - "9404:9404"
   demo-web:
     build: .
     command: "./bin/rails server"
