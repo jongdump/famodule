@@ -1,34 +1,33 @@
-version: '1'
+version: '3'
+
 services:
-  db:
-    image: postgres:16
-    container_name: demo-postgres-16
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # env_file:
+    #   - .env
+    tty: true
+    stdin_open: true
     ports:
-      - "9404:9404"
-  demo-web:
-    build: .
-    command: "./bin/rails server"
-    environment:
-      - RAILS_ENV=${RAILS_ENV}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+      - 3000:3000
     volumes:
-      - app-storage:/rails/storage 
+      - .:/api
+      - bundle:/bundle
     depends_on:
-    - db
+      - db
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    command: --default-authentication-plugin=mysql_native_password
     ports:
-      - "3000:3000"
+      - 3306:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+
 volumes:
-  postgres_data: {}
-  app-storage: {}
-networks:
-  demo_default:
-    
+  bundle:
+  mysql-data:
+    driver: local
